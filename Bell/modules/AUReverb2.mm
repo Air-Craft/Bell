@@ -6,14 +6,14 @@
 //  Copyright (c) 2014 Air Craft. All rights reserved.
 //
 
-#import "AUReverb2Module.h"
+#import "AUReverb2.h"
 
 /////////////////////////////////////////////////////////////////////////
 #pragma mark - Abstract fulfillment / Overrides
 /////////////////////////////////////////////////////////////////////////
-using namespace AUM;
+using namespace bell::modules;
 
-const AudioComponentDescription AUReverb2Module::_auComponentDescription()
+const AudioComponentDescription AUReverb2::_auComponentDescription()
 {
     AudioComponentDescription desc;
     desc.componentType          = kAudioUnitType_Effect;
@@ -25,13 +25,13 @@ const AudioComponentDescription AUReverb2Module::_auComponentDescription()
 
 //---------------------------------------------------------------------
 
-void AUReverb2Module::_willInitializeAU()
+void AUReverb2::_willInitializeAU()
 {
-    // Enforce our canonical format as per AUAudioModuleBase's instructions
-    _setInputBusStreamFormat(0, AUM_kCanonicalStreamFormat);
-    _setOutputBusStreamFormat(0, AUM_kCanonicalStreamFormat);
+    // Enforce our canonical format as per AUModuleBase's instructions
+    _setInputBusStreamFormat(0, kBellCanonicalStreamFormat);
+    _setOutputBusStreamFormat(0, kBellCanonicalStreamFormat);
 
-    auto _ = AUM::ErrorChecker([AUMAudioModuleException class]);
+    auto _ = bell::ErrorChecker([BellAudioModuleException class]);
     UInt32 val = 0;
     _(AudioUnitSetProperty(_audioUnit, kAudioUnitProperty_ShouldAllocateBuffer, kAudioUnitScope_Input, 0, &val, sizeof(val)),
       @"Error telling Reverb2 to not allocate buffers (AudioUnitSetProperty)");
@@ -42,21 +42,21 @@ void AUReverb2Module::_willInitializeAU()
 #pragma mark - Parameters
 /////////////////////////////////////////////////////////////////////////
 
-AudioUnitParameterValue AUReverb2Module::dryWetMix()
+AudioUnitParameterValue AUReverb2::dryWetMix()
 {
     return _getParameter(kReverb2Param_DryWetMix);
 }
 
 //---------------------------------------------------------------------
 
-void AUReverb2Module::dryWetMix(AudioUnitParameterValue value)
+void AUReverb2::dryWetMix(AudioUnitParameterValue value)
 {
     _setParameter(kReverb2Param_DryWetMix, value);
 }
 
 //---------------------------------------------------------------------
 
-AudioUnitParameterValue AUReverb2Module::gain()
+AudioUnitParameterValue AUReverb2::gain()
 {
     return _getParameter(kReverb2Param_Gain);
 
@@ -64,73 +64,73 @@ AudioUnitParameterValue AUReverb2Module::gain()
 
 //---------------------------------------------------------------------
 
-void AUReverb2Module::gain(AudioUnitParameterValue value)
+void AUReverb2::gain(AudioUnitParameterValue value)
 {
     _setParameter(kReverb2Param_Gain, value);
 }
 
 //---------------------------------------------------------------------
 
-AudioUnitParameterValue AUReverb2Module::minDelayTime()
+AudioUnitParameterValue AUReverb2::minDelayTime()
 {
     return _getParameter(kReverb2Param_MinDelayTime);
 }
 
 //---------------------------------------------------------------------
 
-void AUReverb2Module::minDelayTime(AudioUnitParameterValue value)
+void AUReverb2::minDelayTime(AudioUnitParameterValue value)
 {
     _setParameter(kReverb2Param_MinDelayTime, value);
 }
 
 //---------------------------------------------------------------------
 
-AudioUnitParameterValue AUReverb2Module::maxDelayTime()
+AudioUnitParameterValue AUReverb2::maxDelayTime()
 {
     return _getParameter(kReverb2Param_MaxDelayTime);
 }
 
 //---------------------------------------------------------------------
 
-void AUReverb2Module::maxDelayTime(AudioUnitParameterValue value)
+void AUReverb2::maxDelayTime(AudioUnitParameterValue value)
 {
     _setParameter(kReverb2Param_MaxDelayTime, value);
 }
 
 //---------------------------------------------------------------------
 
-AudioUnitParameterValue AUReverb2Module::decayTimeAt0Hz()
+AudioUnitParameterValue AUReverb2::decayTimeAt0Hz()
 {
     return _getParameter(kReverb2Param_DecayTimeAt0Hz);
 }
 
 //---------------------------------------------------------------------
 
-void AUReverb2Module::decayTimeAt0Hz(AudioUnitParameterValue value)
+void AUReverb2::decayTimeAt0Hz(AudioUnitParameterValue value)
 {
     _setParameter(kReverb2Param_DecayTimeAt0Hz, value);
 }
 
 //---------------------------------------------------------------------
 
-AudioUnitParameterValue AUReverb2Module::decayTimeAtNyquist()
+AudioUnitParameterValue AUReverb2::decayTimeAtNyquist()
 {
     return _getParameter(kReverb2Param_DecayTimeAtNyquist);
 }
 
-void AUReverb2Module::decayTimeAtNyquist(AudioUnitParameterValue value)
+void AUReverb2::decayTimeAtNyquist(AudioUnitParameterValue value)
 {
     _setParameter(kReverb2Param_DecayTimeAtNyquist, value);
 }
 
 //---------------------------------------------------------------------
 
-AudioUnitParameterValue AUReverb2Module::AUReverb2Module::randomizeReflections()
+AudioUnitParameterValue AUReverb2::AUReverb2::randomizeReflections()
 {
     return _getParameter(kReverb2Param_RandomizeReflections);
 }
 
-void AUReverb2Module::randomizeReflections(AudioUnitParameterValue value)
+void AUReverb2::randomizeReflections(AudioUnitParameterValue value)
 {
     _setParameter(kReverb2Param_RandomizeReflections, value);
 }

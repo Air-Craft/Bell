@@ -1,27 +1,27 @@
 //
-//  AUMDefs.h
-//  AUM
+//  BellDefs.h
+//  Bell
 //
 //  Created by Hari Karam Singh on 14/12/2013.
 //  Copyright (c) 2013 Air Craft Media Ltd. All rights reserved.
 //
 
-#import "AUMDefs.h"
+#import "BellDefs.h"
 
 
 /////////////////////////////////////////////////////////////////////////
 #pragma mark - ASBD Consts
 /////////////////////////////////////////////////////////////////////////
 
-const AudioStreamBasicDescription AUM_kCanonicalStreamFormat = {
+const AudioStreamBasicDescription kBellCanonicalStreamFormat = {
     .mSampleRate = 44100.0, //kAudioStreamAnyRate,
     .mFormatID = kAudioFormatLinearPCM,
     .mFormatFlags = kAudioFormatFlagsNativeFloatPacked | kAudioFormatFlagIsNonInterleaved,
-    .mBytesPerPacket = sizeof(AUM_Sample) * 1,
+    .mBytesPerPacket = sizeof(BellSample) * 1,
     .mFramesPerPacket = 1,
-    .mBytesPerFrame = sizeof(AUM_Sample) * 1,
+    .mBytesPerFrame = sizeof(BellSample) * 1,
     .mChannelsPerFrame = 2,
-    .mBitsPerChannel = 8 * sizeof(AUM_Sample),
+    .mBitsPerChannel = 8 * sizeof(BellSample),
 };
 
 
@@ -29,7 +29,7 @@ const AudioStreamBasicDescription AUM_kCanonicalStreamFormat = {
 #pragma mark - File Formats - CAF
 /////////////////////////////////////////////////////////////////////////
 
-const AUM_AudioFileFormatDescription AUM_kFileFormat_CAF_LPCM_Stereo_44_1_16bit_Packed_SignedInt_BigEndian = {
+const BellAudioFileFormatDescription kBellFileFormat_CAF_LPCM_Stereo_44_1_16bit_Packed_SignedInt_BigEndian = {
     .fileTypeId = kAudioFileCAFType,
     .streamFormat = {
         .mSampleRate = 44100,
@@ -46,7 +46,7 @@ const AUM_AudioFileFormatDescription AUM_kFileFormat_CAF_LPCM_Stereo_44_1_16bit_
     .extension = "caf\0"
 };
 
-const AUM_AudioFileFormatDescription AUM_kFileFormat_CAF_LPCM_Stereo_44_1_24bit_Packed_SignedInt_BigEndian = {
+const BellAudioFileFormatDescription kBellFileFormat_CAF_LPCM_Stereo_44_1_24bit_Packed_SignedInt_BigEndian = {
     .fileTypeId = kAudioFileCAFType,
     .streamFormat = {
         .mSampleRate = 44100,
@@ -62,7 +62,7 @@ const AUM_AudioFileFormatDescription AUM_kFileFormat_CAF_LPCM_Stereo_44_1_24bit_
     .extension = "caf\0"
 };
 
-const AUM_AudioFileFormatDescription AUM_kFileFormat_CAF_LPCM_Stereo_44_1_32bit_Packed_SignedInt_BigEndian = {
+const BellAudioFileFormatDescription kBellFileFormat_CAF_LPCM_Stereo_44_1_32bit_Packed_SignedInt_BigEndian = {
     .fileTypeId = kAudioFileCAFType,
     .streamFormat = {
         .mSampleRate = 44100,
@@ -78,7 +78,7 @@ const AUM_AudioFileFormatDescription AUM_kFileFormat_CAF_LPCM_Stereo_44_1_32bit_
     .extension = "caf\0"
 };
 
-const AUM_AudioFileFormatDescription AUM_kFileFormat_CAF_LPCM_Stereo_44_1_16bit_Packed_SignedInt = {
+const BellAudioFileFormatDescription kBellFileFormat_CAF_LPCM_Stereo_44_1_16bit_Packed_SignedInt = {
     .fileTypeId = kAudioFileCAFType,
     .streamFormat = {
         .mSampleRate = 44100,
@@ -94,7 +94,7 @@ const AUM_AudioFileFormatDescription AUM_kFileFormat_CAF_LPCM_Stereo_44_1_16bit_
     .extension = "caf\0"
 };
 
-const AUM_AudioFileFormatDescription AUM_kFileFormat_CAF_LPCM_Stereo_44_1_24bit_Packed_SignedInt = {
+const BellAudioFileFormatDescription kBellFileFormat_CAF_LPCM_Stereo_44_1_24bit_Packed_SignedInt = {
     .fileTypeId = kAudioFileCAFType,
     .streamFormat = {
         .mSampleRate = 44100,
@@ -110,7 +110,7 @@ const AUM_AudioFileFormatDescription AUM_kFileFormat_CAF_LPCM_Stereo_44_1_24bit_
     .extension = "caf\0"
 };
 
-const AUM_AudioFileFormatDescription AUM_kFileFormat_CAF_LPCM_Stereo_44_1_32bit_Packed_SignedInt = {
+const BellAudioFileFormatDescription kBellFileFormat_CAF_LPCM_Stereo_44_1_32bit_Packed_SignedInt = {
     .fileTypeId = kAudioFileCAFType,
     .streamFormat = {
         .mSampleRate = 44100,
@@ -126,7 +126,7 @@ const AUM_AudioFileFormatDescription AUM_kFileFormat_CAF_LPCM_Stereo_44_1_32bit_
     .extension = "caf\0"
 };
 
-const AUM_AudioFileFormatDescription AUM_kFileFormat_CAF_LPCM_Stereo_44_1_32bit_Packed_Float = {
+const BellAudioFileFormatDescription kBellFileFormat_CAF_LPCM_Stereo_44_1_32bit_Packed_Float = {
     .fileTypeId = kAudioFileCAFType,
     .streamFormat = {
         .mSampleRate = 44100,
@@ -142,7 +142,7 @@ const AUM_AudioFileFormatDescription AUM_kFileFormat_CAF_LPCM_Stereo_44_1_32bit_
     .extension = "caf\0"
 };
 
-const AUM_AudioFileFormatDescription AUM_kFileFormat_CAF_LPCM_Stereo_44_1_64bit_Packed_Float = {
+const BellAudioFileFormatDescription kBellFileFormat_CAF_LPCM_Stereo_44_1_64bit_Packed_Float = {
     .fileTypeId = kAudioFileCAFType,
     .streamFormat = {
         .mSampleRate = kAudioStreamAnyRate,
@@ -161,7 +161,7 @@ const AUM_AudioFileFormatDescription AUM_kFileFormat_CAF_LPCM_Stereo_44_1_64bit_
 
 /////////////////////////////////////////////////////////////////////////
 
-const AUM_AudioFileFormatDescription AUM_kFileFormat_CAF_MPEG4AAC_Stereo_HardwareCodec = {
+const BellAudioFileFormatDescription kBellFileFormat_CAF_MPEG4AAC_Stereo_HardwareCodec = {
     .fileTypeId = kAudioFileCAFType,
     .streamFormat = {
         .mSampleRate = kAudioStreamAnyRate,
@@ -174,7 +174,7 @@ const AUM_AudioFileFormatDescription AUM_kFileFormat_CAF_MPEG4AAC_Stereo_Hardwar
 
 /////////////////////////////////////////////////////////////////////////
 
-const AUM_AudioFileFormatDescription AUM_kFileFormat_CAF_MPEG4AAC_Stereo_SoftwareCodec = {
+const BellAudioFileFormatDescription kBellFileFormat_CAF_MPEG4AAC_Stereo_SoftwareCodec = {
     .fileTypeId = kAudioFileCAFType,
     .streamFormat = {
         .mSampleRate = kAudioStreamAnyRate,
@@ -187,7 +187,7 @@ const AUM_AudioFileFormatDescription AUM_kFileFormat_CAF_MPEG4AAC_Stereo_Softwar
 
 /////////////////////////////////////////////////////////////////////////
 
-const AUM_AudioFileFormatDescription AUM_kFileFormat_CAF_IMA4_Stereo_SoftwareCodec = {
+const BellAudioFileFormatDescription kBellFileFormat_CAF_IMA4_Stereo_SoftwareCodec = {
     .fileTypeId = kAudioFileCAFType,
     .streamFormat = {
         .mSampleRate = kAudioStreamAnyRate,
@@ -200,7 +200,7 @@ const AUM_AudioFileFormatDescription AUM_kFileFormat_CAF_IMA4_Stereo_SoftwareCod
 
 /////////////////////////////////////////////////////////////////////////
 
-const AUM_AudioFileFormatDescription AUM_kFileFormat_CAF_ALAC_Stereo_SoftwareCodec = {
+const BellAudioFileFormatDescription kBellFileFormat_CAF_ALAC_Stereo_SoftwareCodec = {
     .fileTypeId = kAudioFileCAFType,
     .streamFormat = {
         .mSampleRate = kAudioStreamAnyRate,
@@ -217,7 +217,7 @@ const AUM_AudioFileFormatDescription AUM_kFileFormat_CAF_ALAC_Stereo_SoftwareCod
 #pragma mark - File Formats - AAC
 /////////////////////////////////////////////////////////////////////////
 
-const AUM_AudioFileFormatDescription AUM_kFileFormat_AAC_MPEG4AAC_Stereo_HardwareCodec = {
+const BellAudioFileFormatDescription kBellFileFormat_AAC_MPEG4AAC_Stereo_HardwareCodec = {
     .fileTypeId = kAudioFileAAC_ADTSType,
     .streamFormat = {
         .mSampleRate = kAudioStreamAnyRate,
@@ -228,7 +228,7 @@ const AUM_AudioFileFormatDescription AUM_kFileFormat_AAC_MPEG4AAC_Stereo_Hardwar
     .extension = "aac\0"
 };
 
-const AUM_AudioFileFormatDescription AUM_kFileFormat_AAC_MPEG4AAC_Stereo_SoftwareCodec = {
+const BellAudioFileFormatDescription kBellFileFormat_AAC_MPEG4AAC_Stereo_SoftwareCodec = {
     .fileTypeId = kAudioFileAAC_ADTSType,
     .streamFormat = {
         .mSampleRate = kAudioStreamAnyRate,
@@ -245,7 +245,7 @@ const AUM_AudioFileFormatDescription AUM_kFileFormat_AAC_MPEG4AAC_Stereo_Softwar
 #pragma mark - File Formats - M4A
 /////////////////////////////////////////////////////////////////////////
 
-const AUM_AudioFileFormatDescription AUM_kFileFormat_M4A_MPEG4AAC_Stereo_HardwareCodec = {
+const BellAudioFileFormatDescription kBellFileFormat_M4A_MPEG4AAC_Stereo_HardwareCodec = {
     .fileTypeId = kAudioFileM4AType,
     .streamFormat = {
         .mSampleRate = kAudioStreamAnyRate,
@@ -258,7 +258,7 @@ const AUM_AudioFileFormatDescription AUM_kFileFormat_M4A_MPEG4AAC_Stereo_Hardwar
 
 /////////////////////////////////////////////////////////////////////////
 
-const AUM_AudioFileFormatDescription AUM_kFileFormat_M4A_MPEG4AAC_Stereo_SoftwareCodec = {
+const BellAudioFileFormatDescription kBellFileFormat_M4A_MPEG4AAC_Stereo_SoftwareCodec = {
     .fileTypeId = kAudioFileM4AType,
     .streamFormat = {
         .mSampleRate = kAudioStreamAnyRate,
@@ -271,7 +271,7 @@ const AUM_AudioFileFormatDescription AUM_kFileFormat_M4A_MPEG4AAC_Stereo_Softwar
 
 /////////////////////////////////////////////////////////////////////////
 
-const AUM_AudioFileFormatDescription AUM_kFileFormat_M4A_ALAC_Stereo_SoftwareCodec = {
+const BellAudioFileFormatDescription kBellFileFormat_M4A_ALAC_Stereo_SoftwareCodec = {
     .fileTypeId = kAudioFileM4AType,
     .streamFormat = {
         .mSampleRate = kAudioStreamAnyRate,
@@ -287,7 +287,7 @@ const AUM_AudioFileFormatDescription AUM_kFileFormat_M4A_ALAC_Stereo_SoftwareCod
 #pragma mark - AIFF
 /////////////////////////////////////////////////////////////////////////
 
-const AUM_AudioFileFormatDescription AUM_kFileFormat_AIFF_LPCM_Stereo_44_1_16bit_Packed_SignedInt_BigEndian = {
+const BellAudioFileFormatDescription kBellFileFormat_AIFF_LPCM_Stereo_44_1_16bit_Packed_SignedInt_BigEndian = {
     .fileTypeId = kAudioFileAIFFType,
     .streamFormat = {
         .mSampleRate = 44100,
@@ -303,7 +303,7 @@ const AUM_AudioFileFormatDescription AUM_kFileFormat_AIFF_LPCM_Stereo_44_1_16bit
     .extension = "aif\0"
 };
 
-const AUM_AudioFileFormatDescription AUM_kFileFormat_AIFF_LPCM_Stereo_44_1_24bit_Packed_SignedInt_BigEndian = {
+const BellAudioFileFormatDescription kBellFileFormat_AIFF_LPCM_Stereo_44_1_24bit_Packed_SignedInt_BigEndian = {
     .fileTypeId = kAudioFileAIFFType,
     .streamFormat = {
         .mSampleRate = 44100,
@@ -319,7 +319,7 @@ const AUM_AudioFileFormatDescription AUM_kFileFormat_AIFF_LPCM_Stereo_44_1_24bit
     .extension = "aif\0"
 };
 
-const AUM_AudioFileFormatDescription AUM_kFileFormat_AIFF_LPCM_Stereo_44_1_32bit_Packed_SignedInt_BigEndian = {
+const BellAudioFileFormatDescription kBellFileFormat_AIFF_LPCM_Stereo_44_1_32bit_Packed_SignedInt_BigEndian = {
     .fileTypeId = kAudioFileAIFFType,
     .streamFormat = {
         .mSampleRate = 44100,
@@ -341,7 +341,7 @@ const AUM_AudioFileFormatDescription AUM_kFileFormat_AIFF_LPCM_Stereo_44_1_32bit
 /////////////////////////////////////////////////////////////////////////
 
 /** AIFF plus compression.  You can still used the .aiff extension */
-const AUM_AudioFileFormatDescription AUM_kFileFormat_AIFC_IM4_Stereo_SoftwareCodec = {
+const BellAudioFileFormatDescription kBellFileFormat_AIFC_IM4_Stereo_SoftwareCodec = {
     .fileTypeId = kAudioFileAIFCType,
     .streamFormat = {
         .mSampleRate = kAudioStreamAnyRate,

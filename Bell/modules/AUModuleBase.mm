@@ -1,16 +1,16 @@
 //
 //  AudioUnitRenderer.cpp
-//  AUMLansingAudioBrains
+//  BellLansingAudioBrains
 //
 //  Created by Hari Karam Singh on 15/12/2013.
 //  Copyright (c) 2013 Air Craft Media Ltd. All rights reserved.
 //
 
-#import "AUAudioModuleBase.h"
-#import "AUMExceptions.h"
-#import "AUMUtils.h"
+#import "AUModuleBase.h"
+#import "BellExceptions.h"
+#import "BellUtils.h"
 
-AUM::AUAudioModuleBase::AUAudioModuleBase()
+bell::modules::AUModuleBase::AUModuleBase()
 {
     // Allocate the wrapper for the render buffers
     // Look at the struct to see where we get this from.  2 is the number of channels.  Variable channels is why this needs to be a malloc'ed pointer
@@ -24,16 +24,16 @@ AUM::AUAudioModuleBase::AUAudioModuleBase()
 
 //---------------------------------------------------------------------
 
-AUM::AUAudioModuleBase::~AUAudioModuleBase()
+bell::modules::AUModuleBase::~AUModuleBase()
 {
     _destroyAudioBufferListStruct(_audioBufferList);
 }
 
 //---------------------------------------------------------------------
 
-void AUM::AUAudioModuleBase::initialize()
+void bell::modules::AUModuleBase::initialize()
 {
-    auto _ = AUM::ErrorChecker([AUMAudioModuleException class]);
+    auto _ = bell::ErrorChecker([BellAudioModuleException class]);
     
     // Load the AU spec'ed by the subclass
     AudioComponentDescription desc = this->_auComponentDescription();
@@ -73,9 +73,9 @@ void AUM::AUAudioModuleBase::initialize()
 
 //---------------------------------------------------------------------
 
-void AUM::AUAudioModuleBase::_setInputBusStreamFormat(UInt32 busNum, AudioStreamBasicDescription format)
+void bell::modules::AUModuleBase::_setInputBusStreamFormat(UInt32 busNum, AudioStreamBasicDescription format)
 {
-    auto _ = AUM::ErrorChecker([AUMAudioModuleException class]);
+    auto _ = bell::ErrorChecker([BellAudioModuleException class]);
 
     _(AudioUnitSetProperty(_audioUnit,
                            kAudioUnitProperty_StreamFormat,
@@ -88,9 +88,9 @@ void AUM::AUAudioModuleBase::_setInputBusStreamFormat(UInt32 busNum, AudioStream
 
 //---------------------------------------------------------------------
 
-void AUM::AUAudioModuleBase::_setOutputBusStreamFormat(UInt32 busNum, AudioStreamBasicDescription format)
+void bell::modules::AUModuleBase::_setOutputBusStreamFormat(UInt32 busNum, AudioStreamBasicDescription format)
 {
-    auto _ = AUM::ErrorChecker([AUMAudioModuleException class]);
+    auto _ = bell::ErrorChecker([BellAudioModuleException class]);
     
     _(AudioUnitSetProperty(_audioUnit,
                            kAudioUnitProperty_StreamFormat,
@@ -103,9 +103,9 @@ void AUM::AUAudioModuleBase::_setOutputBusStreamFormat(UInt32 busNum, AudioStrea
 
 //---------------------------------------------------------------------
 
-void AUM::AUAudioModuleBase::_setParameter(AudioUnitParameterID paramId, AudioUnitParameterValue paramValue, AudioUnitScope scope, AudioUnitElement element)
+void bell::modules::AUModuleBase::_setParameter(AudioUnitParameterID paramId, AudioUnitParameterValue paramValue, AudioUnitScope scope, AudioUnitElement element)
 {
-    auto _ = AUM::ErrorChecker([AUMAudioModuleException class]);
+    auto _ = bell::ErrorChecker([BellAudioModuleException class]);
     
     _(AudioUnitSetParameter(_audioUnit,
                             paramId,
@@ -118,9 +118,9 @@ void AUM::AUAudioModuleBase::_setParameter(AudioUnitParameterID paramId, AudioUn
 
 //---------------------------------------------------------------------
 
-AudioUnitParameterValue AUM::AUAudioModuleBase::_getParameter(AudioUnitParameterID paramId, AudioUnitScope scope, AudioUnitElement element)
+AudioUnitParameterValue bell::modules::AUModuleBase::_getParameter(AudioUnitParameterID paramId, AudioUnitScope scope, AudioUnitElement element)
 {
-    auto _ = AUM::ErrorChecker([AUMAudioModuleException class]);
+    auto _ = bell::ErrorChecker([BellAudioModuleException class]);
     
     AudioUnitParameterValue value;
     

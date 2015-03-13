@@ -1,14 +1,14 @@
  //
-//  AUMExceptions.m
-//  AUMLansingAudioBrains
+//  BellExceptions.m
+//  BellLansingAudioBrains
 //
 //  Created by Hari Karam Singh on 16/12/2013.
 //  Copyright (c) 2013 Air Craft Media Ltd. All rights reserved.
 //
 
-#import "AUMExceptions.h"
+#import "BellExceptions.h"
 
-@implementation AUMException
+@implementation BellException
 
 /////////////////////////////////////////////////////////////////////////
 #pragma mark - Life Cycle
@@ -79,7 +79,7 @@
 /////////////////////////////////////////////////////////////////////////
 #pragma mark - Subclasses
 /////////////////////////////////////////////////////////////////////////
-@implementation AUMAudioSessionException @end
-@implementation AUMAudioModuleException @end
-@implementation AUMAudioFileIOException @end
+@implementation BellAudioSessionException @end
+@implementation BellAudioModuleException @end
+@implementation BellAudioFileIOException @end
 

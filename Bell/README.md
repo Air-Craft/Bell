@@ -9,4 +9,4 @@
 
 # TODO #
 
-- Typedef AUM_Size and cleanup (can frame ever be < 0?  Why the SInt32 sometimes??)
+- Typedef Bell_Size and cleanup (can frame ever be < 0?  Why the BellSize sometimes??)

@@ -1,6 +1,6 @@
 //
-//  AUMExceptions.h
-//  AUMLansingAudioBrains
+//  BellExceptions.h
+//  BellLansingAudioBrains
 //
 //  Created by Hari Karam Singh on 16/12/2013.
 //  Copyright (c) 2013 Air Craft Media Ltd. All rights reserved.
@@ -12,7 +12,7 @@
 #pragma mark - Base Class
 /////////////////////////////////////////////////////////////////////////
 
-@interface AUMException : NSException
+@interface BellException : NSException
 
 + (instancetype)exceptionWithFormat:(NSString *)format, ...;
 
@@ -28,9 +28,9 @@
 #pragma mark - Subclasses
 /////////////////////////////////////////////////////////////////////////
 
-@interface AUMAudioSessionException : AUMException @end
-@interface AUMAudioModuleException : AUMException @end
-@interface AUMAudioFileIOException : AUMException @end
+@interface BellAudioSessionException : BellException @end
+@interface BellAudioModuleException : BellException @end
+@interface BellAudioFileIOException : BellException @end
 
 
 
@@ -39,11 +39,11 @@
 /////////////////////////////////////////////////////////////////////////
 
 #ifdef __cplusplus
-namespace AUM {
+namespace bell {
     /** A functor to get an error handler shorthand which is set to throw a specific Objective-C class type. Only works in (Objective-)C++ code
      
      USAGE: 
-     auto _ = AUM::ErrorChecker([AUMAudioModuleException class])
+     auto _ = bell::ErrorChecker([BellAudioModuleException class])
      
      _(someFuncWhichReturnsOSStatus(), @"Error calling some func");
      
@@ -59,8 +59,8 @@ namespace AUM {
     public:
         ErrorChecker(Class objcExceptionClass) : _objcExceptionClass(objcExceptionClass) {
             // Check it's a legit
-            if (not [_objcExceptionClass isSubclassOfClass:[AUMException class]]) {
-                [NSException raise:NSInvalidArgumentException format:@"Class must be a subclass of AUMException!"];
+            if (not [_objcExceptionClass isSubclassOfClass:[BellException class]]) {
+                [NSException raise:NSInvalidArgumentException format:@"Class must be a subclass of BellException!"];
             }
         };
         
@@ -71,7 +71,7 @@ namespace AUM {
                 va_list args;
                 va_start(args, format);
                 NSString *msg = [[NSString alloc] initWithFormat:format arguments:args];
-                AUMException *e = [_objcExceptionClass exceptionWithFormat:msg];
+                BellException *e = [_objcExceptionClass exceptionWithFormat:msg];
                 va_end(args);
                 e.OSStatus = err;
                 @throw e;
@@ -83,7 +83,7 @@ namespace AUM {
             if (err != nil) {
                 va_list args;
                 va_start(args, format);
-                AUMException *e = [_objcExceptionClass exceptionWithFormat:format, args];
+                BellException *e = [_objcExceptionClass exceptionWithFormat:format, args];
                 va_end(args);
                 e.underlyingError = err;
                 @throw e;

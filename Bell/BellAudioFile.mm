@@ -1,5 +1,5 @@
 //
-//  AUMAudioFile.m
+//  BellAudioFile.m
 //  MantraCraft
 //
 //  Created by Hari Karam Singh on 18/07/2014.
@@ -7,16 +7,19 @@
 //
 
 #import <Accelerate/Accelerate.h>
+#import <AudioToolbox/AudioToolbox.h>
 #import <tgmath.h>
-#import "AUMAudioFile.h"
-#import "AUMDefs.h"
-#import "AUMExceptions.h"
-#import "AUMUtils.h"
+#import "BellAudioFile.h"
+#import "BellDefs.h"
+#import "BellExceptions.h"
+#import "BellUtils.h"
 
 
-@implementation AUMAudioFile
+@implementation BellAudioFile
 {
-    UInt32 _readPosInFrames;    ///< Track read position to prevent unnecessary Seeks on Read
+    BellSize _readPosInFrames;    ///< Track read position to prevent unnecessary Seeks on Read
+    NSMutableData *_preloadBufferL;
+    NSMutableData *_preloadBufferR;
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -32,7 +35,7 @@
 
 //---------------------------------------------------------------------
 
-+ (instancetype)createNewAudioFileWithURL:(NSURL *)fileURL fileFormat:(AUM_AudioFileFormatDescription)fileFormat
++ (instancetype)createNewAudioFileWithURL:(NSURL *)fileURL fileFormat:(BellAudioFileFormatDescription)fileFormat
 {
     id me = [self new];
     [me createNewAudioFileWithURL:fileURL fileFormat:fileFormat];
@@ -46,7 +49,7 @@
 
 - (void)openAudioFileWithURL:(NSURL *)fileURL
 {
-    auto _ = AUM::ErrorChecker([AUMAudioFileIOException class]);
+    auto _ = bell::ErrorChecker([BellAudioFileIOException class]);
 
     // Only allow opening once
     if (fileRef) {
@@ -73,12 +76,12 @@
       @"Error reading ASBD from file %@", _fileURL.lastPathComponent);
 
     // Set the default output format
-    self.clientStreamFormat = AUM_kCanonicalStreamFormat;     // Sets the property on the ExtAudioFile as well
+    self.clientStreamFormat = kBellCanonicalStreamFormat;     // Sets the property on the ExtAudioFile as well
 }
 
 //---------------------------------------------------------------------
 
-- (void)createNewAudioFileWithURL:(NSURL *)fileURL fileFormat:(AUM_AudioFileFormatDescription)fileFormat
+- (void)createNewAudioFileWithURL:(NSURL *)fileURL fileFormat:(BellAudioFileFormatDescription)fileFormat
 {
     NSParameterAssert(fileFormat.fileTypeId);
     // Only allow opening once
@@ -87,10 +90,10 @@
     }
     
     // @TEMP Fix me when swift is better
-    AUM_AudioFileFormatDescription ff = AUM_kFileFormat_CAF_LPCM_Stereo_44_1_16bit_Packed_SignedInt_BigEndian;
-//    AUM_AudioFileFormatDescription ff = fileFormat;
+    BellAudioFileFormatDescription ff = kBellFileFormat_CAF_LPCM_Stereo_44_1_16bit_Packed_SignedInt_BigEndian;
+//    BellAudioFileFormatDescription ff = fileFormat;
     
-    auto _ = AUM::ErrorChecker([AUMAudioFileIOException class]);
+    auto _ = bell::ErrorChecker([BellAudioFileIOException class]);
     
     ExtAudioFileRef newFileRef;
     
@@ -109,7 +112,7 @@
     
     // Set the client data format for how we'll feed it.  Defaults to Canonical
     // (Needs ->fileRef set)
-    self.clientStreamFormat = AUM_kCanonicalStreamFormat;
+    self.clientStreamFormat = kBellCanonicalStreamFormat;
     
     // Explicitly set the codec (hardware/software) to prevent various issues
     // See http://michaelchinen.com/2012/04/30/ios-encoding-to-aac-with-the-extended-audio-file-services-gotchas/
@@ -153,11 +156,11 @@
 #pragma mark - Properties
 /////////////////////////////////////////////////////////////////////////
 
-- (SInt64)lengthInFrames
+- (BellSize)lengthInFrames
 {
-    auto _ = AUM::ErrorChecker([AUMAudioFileIOException class]);
+    auto _ = bell::ErrorChecker([BellAudioFileIOException class]);
  
-    SInt64 lengthInFrames;
+    BellSize lengthInFrames;
     UInt32 s = sizeof(lengthInFrames);
     _(ExtAudioFileGetProperty(fileRef,
                               kExtAudioFileProperty_FileLengthFrames,
@@ -179,7 +182,7 @@
 
 - (void)setFileStreamFormat:(AudioStreamBasicDescription)fileStreamFormat
 {
-    auto _ = AUM::ErrorChecker([AUMAudioFileIOException class]);
+    auto _ = bell::ErrorChecker([BellAudioFileIOException class]);
 
     UInt32 s = sizeof(AudioStreamBasicDescription);
     _(ExtAudioFileSetProperty(fileRef,
@@ -195,7 +198,7 @@
 
 - (void)setClientStreamFormat:(AudioStreamBasicDescription)clientStreamFormat
 {
-    auto _ = AUM::ErrorChecker([AUMAudioFileIOException class]);
+    auto _ = bell::ErrorChecker([BellAudioFileIOException class]);
     
     UInt32 s = sizeof(AudioStreamBasicDescription);
     _(ExtAudioFileSetProperty(fileRef,
@@ -213,9 +216,26 @@
 #pragma mark - Public Methods
 /////////////////////////////////////////////////////////////////////////
 
-- (void)seekToFrame:(SInt32)theFrame
+- (BellSize)preloadFrames:(BellSize)framesToPreload
 {
-    auto _ = AUM::ErrorChecker([AUMAudioModuleException class]);
+    // Client format as it's converted to this when reading
+    BellSize byteSize = framesToPreload * _clientStreamFormat.mBytesPerFrame;
+    _preloadBufferL = [NSMutableData dataWithLength:byteSize];
+    _preloadBufferR = [NSMutableData dataWithLength:byteSize];
+    
+    BellSize framesPreloaded = [self readFrames:framesToPreload
+                                      fromFrame:0
+                                    intoBufferL:_preloadBufferL.mutableBytes
+                                        bufferR:_preloadBufferR.mutableBytes];
+    _preloadedFrames = framesPreloaded;
+    return _preloadedFrames;
+}
+
+//---------------------------------------------------------------------
+
+- (void)seekToFrame:(BellSize)theFrame
+{
+    auto _ = bell::ErrorChecker([BellAudioModuleException class]);
     
     if (theFrame >= self.lengthInFrames) {
         [NSException raise:NSRangeException format:@"Frame %lu out of bounds for file %@ of length %lu frames)", (unsigned long)theFrame, _fileURL.lastPathComponent, (unsigned long)self.lengthInFrames];
@@ -237,10 +257,10 @@
 
 //---------------------------------------------------------------------
 
-- (void)readFromFrame:(SInt32)startFrame toFrame:(SInt32)endFrame withChunkSize:(UInt32)framesPerChunk usingBlock:(void (^)(AudioBufferList *, SInt32, SInt32))readCallback
+- (void)readFromFrame:(BellSize)startFrame toFrame:(BellSize)endFrame withChunkSize:(BellSize)framesPerChunk usingBlock:(void (^)(AudioBufferList *, BellSize, BellSize))readCallback
 {
     // Prep a reusable ABL...
-    AudioBufferList *abl = AUM_CreateAudioBufferList((UInt32)_clientStreamFormat.mChannelsPerFrame, (UInt32)(_clientStreamFormat.mBytesPerFrame * framesPerChunk));
+    AudioBufferList *abl = Bell_CreateAudioBufferList((BellSize)_clientStreamFormat.mChannelsPerFrame, (BellSize)(_clientStreamFormat.mBytesPerFrame * framesPerChunk));
     
     // Silently cap endFrame to the last one in the file
     if (endFrame >= self.lengthInFrames) {
@@ -248,8 +268,8 @@
     }
     
     // Read and then call out callback block
-    SInt32 pos = startFrame;
-    SInt32 framesActuallyRead;
+    BellSize pos = startFrame;
+    BellSize framesActuallyRead;
     do {
         framesActuallyRead =
         [self readFrames:framesPerChunk fromFrame:pos intoAudioBufferList:abl];
@@ -262,62 +282,80 @@
     // Bail if we reach the end or the file or our frame length
     
     // Cleanup
-    AUM_ReleaseAudioBufferList(abl);
+    Bell_ReleaseAudioBufferList(abl);
 }
 
 //---------------------------------------------------------------------
 
-- (SInt32)readFrames:(UInt32)theFrameCount intoBufferL:(void *)aBufferL bufferR:(void *)aBufferR
+- (BellSize)readFrames:(BellSize)theFrameCount intoBufferL:(void *)aBufferL bufferR:(void *)aBufferR
 {
     return [self readFrames:theFrameCount fromFrame:_currentReadPosition intoBufferL:aBufferL bufferR:aBufferR];
 }
 
 //---------------------------------------------------------------------
 
-- (SInt32)readFrames:(UInt32)theFrameCount fromFrame:(SInt32)theStartFrame intoBufferL:(void *)aBufferL bufferR:(void *)aBufferR
+- (BellSize)readFrames:(BellSize)theFrameCount
+             fromFrame:(BellSize)theStartFrame
+           intoBufferL:(void *)aBufferL
+               bufferR:(void *)aBufferR
 {
     // Get the data size required
-    UInt32 dataSizeBytes = _clientStreamFormat.mBytesPerFrame * theFrameCount;
+    BellSize dataSizeBytes = _clientStreamFormat.mBytesPerFrame * theFrameCount;
     
     // Malloc the ABL
     void *buffers[2] = {aBufferL, aBufferR};
-    AudioBufferList *abl = AUM_CreateAudioBufferListUsingExistingBuffers(_clientStreamFormat.mChannelsPerFrame, buffers, dataSizeBytes);
+    AudioBufferList *abl = Bell_CreateAudioBufferListUsingExistingBuffers(_clientStreamFormat.mChannelsPerFrame, buffers, dataSizeBytes);
     
     // Setup and assign the underlying buffer to our pointer argument
     abl->mNumberBuffers = _clientStreamFormat.mChannelsPerFrame;
     abl->mBuffers[0].mNumberChannels = 1;               // always 1 for non-interleaved
-    abl->mBuffers[0].mDataByteSize = dataSizeBytes;
+    abl->mBuffers[0].mDataByteSize = (UInt32)dataSizeBytes;
     abl->mBuffers[0].mData = aBufferL;
     
     // Create the other buffer only if stereo
     // ? SHOULD THIS BE fileStreamFormat?
     if (_clientStreamFormat.mChannelsPerFrame > 1) {
         abl->mBuffers[1].mNumberChannels = 1;
-        abl->mBuffers[1].mDataByteSize = dataSizeBytes;
+        abl->mBuffers[1].mDataByteSize = (UInt32)dataSizeBytes;
         abl->mBuffers[1].mData = aBufferR;
     }
     
-    UInt32 framesRead = [self readFrames:theFrameCount fromFrame:theStartFrame intoAudioBufferList:abl];
+    BellSize framesRead = [self readFrames:theFrameCount fromFrame:theStartFrame intoAudioBufferList:abl];
     
     // If mono then copy to aBufferR
     if (_clientStreamFormat.mChannelsPerFrame == 1) {
         memcpy(aBufferR, aBufferL, dataSizeBytes);
     }
     
-    AUM_ReleaseAudioBufferListPreservingBuffers(abl);
+    Bell_ReleaseAudioBufferListPreservingBuffers(abl);
     
     return framesRead;
 }
 
 //---------------------------------------------------------------------
 
-- (SInt32)readFrames:(UInt32)theFrameCount fromFrame:(SInt32)theStartFrame intoAudioBufferList:(AudioBufferList *)theAudioBufferList
+- (BellSize)readFrames:(BellSize)theFrameCount fromFrame:(BellSize)theStartFrame intoAudioBufferList:(AudioBufferList *)theAudioBufferList
 {
-    auto _ = AUM::ErrorChecker([AUMAudioFileIOException class]);
+    auto _ = bell::ErrorChecker([BellAudioFileIOException class]);
 
+    // Attempt to pull from the preload buffer but only if it has them all (for now)
+    // @TODO Make the read smart about pulling segments of the priming buffer
+    if (_preloadedFrames > 0 // for speed
+        && theStartFrame + theFrameCount <= _preloadedFrames)
+    {
+        info("Reading %i frames from Preload Buffer", (int)theFrameCount);
+        BellSize byteSize = theFrameCount * _clientStreamFormat.mBytesPerFrame;
+        BellSize bytesFrom = theStartFrame * _clientStreamFormat.mBytesPerFrame;
+        const void *fromL = (char *)_preloadBufferL.mutableBytes + bytesFrom;
+        const void *fromR = (char *)_preloadBufferR.mutableBytes + bytesFrom;
+        memcpy(theAudioBufferList->mBuffers[0].mData, fromL, byteSize);
+        memcpy(theAudioBufferList->mBuffers[1].mData, fromR, byteSize);
+        return theFrameCount;
+    }
+    
     // Don't check bounds.  Will return the number of frames read if less than requested.  This is how you determine EOF
     
-    UInt32 framesToReadAndRead = theFrameCount;
+    BellSize framesToReadAndRead = theFrameCount;
     
     // Seek if required
     if (theStartFrame != _currentReadPosition) {
@@ -325,8 +363,11 @@
           @"Error seeking to frame %i in file %@", theStartFrame, _fileURL.lastPathComponent);
     }
     
-    _(ExtAudioFileRead(fileRef, &framesToReadAndRead, theAudioBufferList),
+    // Workaround for antiquated typing in CoreAudio
+    UInt32 frames2RR = (UInt32)framesToReadAndRead;
+    _(ExtAudioFileRead(fileRef, &frames2RR, theAudioBufferList),
       @"Error reading %i - %i frames from file %@", theStartFrame, theStartFrame+theFrameCount, _fileURL.lastPathComponent);
+    framesToReadAndRead = frames2RR;
     
     // update read head
     _currentReadPosition = theStartFrame + framesToReadAndRead;
@@ -353,14 +394,14 @@
     BOOL asMono = (rightDataPtr == NULL || self.fileStreamFormat.mChannelsPerFrame == 1);
     
     // Allocate the data buffer(s) based on the desired size
-    UInt32 inputFrames = (UInt32)self.lengthInFrames;
+    BellSize inputFrames = (BellSize)self.lengthInFrames;
     size_t inputBytes = _clientStreamFormat.mBytesPerFrame * inputFrames;
     void *left = malloc(inputBytes);
     void *right = malloc(inputBytes);    // do this even if mono as read needs it
     
     // Read from the file and grab the actual read size
     [self seekToFrame:0];
-    SInt32 framesRead = [self readFrames:inputFrames intoBufferL:left bufferR:right];
+    BellSize framesRead = [self readFrames:inputFrames intoBufferL:left bufferR:right];
     
     // Calculate the downsampled sizes
     size_t outputFrames = round(framesRead / downsampleFactor);
@@ -398,11 +439,11 @@
 #pragma mark - Write Methods
 /////////////////////////////////////////////////////////////////////////
 
-- (void)writeFrames:(UInt32)theFrameCount fromAudioBufferList:(AudioBufferList *)abl
+- (void)writeFrames:(BellSize)theFrameCount fromAudioBufferList:(AudioBufferList *)abl
 {
-    auto _ = AUM::ErrorChecker([AUMAudioFileIOException class]);
+    auto _ = bell::ErrorChecker([BellAudioFileIOException class]);
 
-    _(ExtAudioFileWrite(fileRef, theFrameCount, abl),
+    _(ExtAudioFileWrite(fileRef, (UInt32)theFrameCount, abl),
       @"Failed to write %i frames to file %@", (int)theFrameCount, _fileURL);
 }
 

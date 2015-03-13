@@ -1,16 +1,16 @@
 //
-//  AUMUtils.m
+//  BellUtils.m
 //  MantraCraft
 //
 //  Created by Hari Karam Singh on 18/07/2014.
 //  Copyright (c) 2014 Air Craft. All rights reserved.
 //
 
-#import "AUMUtils.h"
-#import "AUMDefs.h"
+#import "BellUtils.h"
+#import "BellDefs.h"
 
 
-void AUM_tmp()
+void Bell_tmp()
 {
 //    AudioFormatGetPropertyInfo(
 }
@@ -18,7 +18,7 @@ void AUM_tmp()
 //---------------------------------------------------------------------
 
 
-void AUM_printWritableTypes()
+void Bell_printWritableTypes()
 {
     OSStatus err = noErr;
     UInt32 infoSize = 0;
@@ -81,7 +81,7 @@ void AUM_printWritableTypes()
 //---------------------------------------------------------------------
 
 
-void AUM_printAvailableStreamFormatsForId(AudioFileTypeID fileTypeID, UInt32 mFormatID)
+void Bell_printAvailableStreamFormatsForId(AudioFileTypeID fileTypeID, UInt32 mFormatID)
 {
     AudioFileTypeAndFormatID fileTypeAndFormat;
     fileTypeAndFormat.mFileType = fileTypeID;
@@ -130,12 +130,12 @@ void AUM_printAvailableStreamFormatsForId(AudioFileTypeID fileTypeID, UInt32 mFo
     for (int i=0; i<asbdCount; i++) {
         UInt32 format4cc = CFSwapInt32HostToBig(asbds[i].mFormatID);
         
-        NSLog(@"%d: fileTypeID: %4.4s, mFormatId: %4.4s, mFormatFlags: %ld, mBitsPerChannel: %ld",
+        NSLog(@"%d: fileTypeID: %4.4s, mFormatId: %4.4s, mFormatFlags: %u, mBitsPerChannel: %u",
               i,
               (char*)&fileTypeIDChar,
               (char*)&format4cc,
-              asbds[i].mFormatFlags,
-              asbds[i].mBitsPerChannel);
+              (unsigned int)asbds[i].mFormatFlags,
+              (unsigned int)asbds[i].mBitsPerChannel);
     }
     
     free (asbds);
@@ -144,7 +144,7 @@ void AUM_printAvailableStreamFormatsForId(AudioFileTypeID fileTypeID, UInt32 mFo
 
 //---------------------------------------------------------------------
 
-AudioBufferList *AUM_CreateAudioBufferList(UInt32 numChannels, UInt32 bufferBytesSize)
+AudioBufferList *Bell_CreateAudioBufferList(BellSize numChannels, BellSize bufferBytesSize)
 {
     // Allocate the underlying buffers...
     void **buffers = malloc(sizeof(void *) * numChannels);
@@ -152,16 +152,16 @@ AudioBufferList *AUM_CreateAudioBufferList(UInt32 numChannels, UInt32 bufferByte
         buffers[i] = malloc(bufferBytesSize);
     }
     
-    return AUM_CreateAudioBufferListUsingExistingBuffers(numChannels, buffers, bufferBytesSize);
+    return Bell_CreateAudioBufferListUsingExistingBuffers(numChannels, buffers, bufferBytesSize);
 }
 
 //---------------------------------------------------------------------
 
 /** Creates a non-interleaved ABL with the given number of channels using pre-allocated buffers */
-AudioBufferList *AUM_CreateAudioBufferListUsingExistingBuffers(UInt32 numChannels, void *buffers[], UInt32 bufferBytesSize)
+AudioBufferList *Bell_CreateAudioBufferListUsingExistingBuffers(BellSize numChannels, void *buffers[], BellSize bufferBytesSize)
 {
     AudioBufferList *abl;
-    UInt32 ablSize = offsetof(AudioBufferList, mBuffers[0]) + sizeof(AudioBuffer) * numChannels;
+    BellSize ablSize = offsetof(AudioBufferList, mBuffers[0]) + sizeof(AudioBuffer) * numChannels;
     abl = malloc(ablSize);
     
     abl->mNumberBuffers = numChannels;
@@ -177,7 +177,7 @@ AudioBufferList *AUM_CreateAudioBufferListUsingExistingBuffers(UInt32 numChannel
 
 //---------------------------------------------------------------------
 
-void AUM_ReleaseAudioBufferList(AudioBufferList *abl)
+void Bell_ReleaseAudioBufferList(AudioBufferList *abl)
 {
     // Free the individual data bufers
     for (int i=0; i < abl->mNumberBuffers; i++) {
@@ -190,7 +190,7 @@ void AUM_ReleaseAudioBufferList(AudioBufferList *abl)
 
 //---------------------------------------------------------------------
 
-void AUM_ReleaseAudioBufferListPreservingBuffers(AudioBufferList *abl)
+void Bell_ReleaseAudioBufferListPreservingBuffers(AudioBufferList *abl)
 {
     free(abl);
 }

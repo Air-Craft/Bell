@@ -1,5 +1,5 @@
 //
-//  AUMSession.h
+//  BellSession.h
 //  MantraCraft
 //
 //  Created by Hari Karam Singh on 17/07/2014.
@@ -14,7 +14,7 @@
 #pragma mark - Main Class
 /////////////////////////////////////////////////////////////////////////
 
-@interface AUMSession : NSObject
+@interface BellSession : NSObject
 
 @property (nonatomic, readonly) NSTimeInterval sampleRate;
 @property (nonatomic, readonly) NSTimeInterval ioBufferDuration;
@@ -23,15 +23,15 @@
 @property (atomic) BOOL microphoneEnabled;
 
 /** 
- Uses defaults AVAudioSessionCategoryPlayAndRecord / AVAudioSessionCategoryOptionDuckOthers / 44.1kHz / 0.01s (IOBuffer) / AUM_kCanonicalStreamFormat.  Note the actualy IOBuffer size and sample rate may differ (esp on simulator) so be sure to check afterwards (standard CoreAudio procedure).  The session is also set to "active" on init.
+ Uses defaults AVAudioSessionCategoryPlayAndRecord / AVAudioSessionCategoryOptionDuckOthers / 44.1kHz / 0.01s (IOBuffer) / kBellCanonicalStreamFormat.  Note the actualy IOBuffer size and sample rate may differ (esp on simulator) so be sure to check afterwards (standard CoreAudio procedure).  The session is also set to "active" on init.
  @override
- @throws AUMException if audio engine fails to initialise for any reasons
+ @throws BellException if audio engine fails to initialise for any reasons
  */
 - (instancetype)init;
 
 /** 
  Specify your own params
- @throws AUMException @see init 
+ @throws BellException @see init 
  */
 - (instancetype)initWithCategory:(NSString * const)category
                  categoryOptions:(AVAudioSessionCategoryOptions)categoryOptions
@@ -44,12 +44,12 @@
 
 
 /** 
- @throws AUMException
+ @throws BellException
  */
 - (void)startAudio;
 
 /**
- @throws AUMException
+ @throws BellException
  */
 - (void)stopAudio;
 

@@ -12,14 +12,14 @@
  \copyright  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
  @{
  */
-/// \file AUMAtomicType.h
+/// \file BellAtomicType.h
 
-#ifndef AUM_ATOMIC_TYPE
-#define AUM_ATOMIC_TYPE 1
+#ifndef BELL_ATOMIC_TYPE
+#define BELL_ATOMIC_TYPE 1
 
 #import <libkern/OSAtomic.h>
 
-namespace AUM
+namespace bell
 {
     
 /////////////////////////////////////////////////////////////////////////
@@ -52,7 +52,7 @@ namespace AUM
             
             // Update our property
             int c = -1;
-            while (not OSAtomicCompareAndSwap32Barrier(_val, tmp, &_val)) {
+            while (not ::OSAtomicCompareAndSwap32Barrier(_val, tmp, &_val)) {
                 if (c++ > 10000) {
                     [NSException raise:NSInternalInconsistencyException format:@"Atomic op not completed in %i attempts", c];
                 };
@@ -81,7 +81,7 @@ namespace AUM
         
     //---------------------------------------------------------------------
         
-        inline T operator+=(int arg)
+        inline T operator+=(T arg)
         {
             *this = *this + arg;
             return _toType();
@@ -89,7 +89,7 @@ namespace AUM
         
     //---------------------------------------------------------------------
         
-        inline T operator-=(int arg)
+        inline T operator-=(T arg)
         {
             *this = *this - arg;
             return _toType();
@@ -136,8 +136,8 @@ namespace AUM
         
     //---------------------------------------------------------------------
         
-        /** Copy constructor  (for AtomicType32<T> x = anotherAtomicType32) */
-        AtomicType64<T>(const AtomicType32<T>& t)
+        /** Copy constructor  (for AtomicType64<T> x = another AtomicType64) */
+        AtomicType64<T>(const AtomicType64<T>& t)
         {
             *this = t;
         };
@@ -152,7 +152,7 @@ namespace AUM
             
             // Update our property
             int c = -1;
-            while (not OSAtomicCompareAndSwap32Barrier(_val, tmp, &_val)) {
+            while (not ::OSAtomicCompareAndSwap64Barrier(_val, tmp, &_val)) {
                 if (c++ > 10000) {
                     [NSException raise:NSInternalInconsistencyException format:@"Atomic op not completed in %i attempts", c];
                 };
@@ -170,7 +170,6 @@ namespace AUM
             return *this;
         };
         
-        
     //---------------------------------------------------------------------
         
         /** Casting operator to the type T */
@@ -181,7 +180,7 @@ namespace AUM
         
     //---------------------------------------------------------------------
         
-        inline T operator+=(int arg)
+        inline T operator+=(T arg)
         {
             *this = *this + arg;
             return _toType();
@@ -189,7 +188,7 @@ namespace AUM
         
     //---------------------------------------------------------------------
         
-        inline T operator-=(int arg)
+        inline T operator-=(T arg)
         {
             *this = *this - arg;
             return _toType();
@@ -250,7 +249,7 @@ namespace AUM
             
             // Update our property
             int c = -1;
-            while (not OSAtomicCompareAndSwap32Barrier(_val, intVal, &_val)) {
+            while (not ::OSAtomicCompareAndSwap32Barrier(_val, intVal, &_val)) {
                 if (c++ > 10000) {
                     [NSException raise:NSInternalInconsistencyException format:@"Atomic op not completed in %i attempts", c];
                 };

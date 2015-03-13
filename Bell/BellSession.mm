@@ -1,5 +1,5 @@
 //
-//  AUM.m
+//  Bell.m
 //  MantraCraft
 //
 //  Created by Hari Karam Singh on 17/07/2014.
@@ -7,25 +7,25 @@
 //
 
 #import <Accelerate/Accelerate.h>
-#import "AUM.h"
-#import "AUMDefs.h"
-#import "AUMExceptions.h"
+#import "Bell.h"
+#import "BellDefs.h"
+#import "BellExceptions.h"
 #import "AtomicTypes.h"
 
 
 typedef struct {
     AudioUnit remoteIOUnit;
-    AUM::AtomicBool micEnabled;
+    bell::AtomicBool micEnabled;
     AURenderCallback wrappedRCB;
     void *wrappedInRefCon;
-} _AUMSessionInRefConWrapper;
+} _BellSessionInRefConWrapper;
 
 
 /////////////////////////////////////////////////////////////////////////
 #pragma mark -
 /////////////////////////////////////////////////////////////////////////
 
-OSStatus _AUMSessionRCBWrapper(void *inRefCon,
+OSStatus _BellSessionRCBWrapper(void *inRefCon,
                                AudioUnitRenderActionFlags *	ioActionFlags,
                                const AudioTimeStamp *		inTimeStamp,
                                UInt32						inBusNumber,
@@ -33,7 +33,7 @@ OSStatus _AUMSessionRCBWrapper(void *inRefCon,
                                AudioBufferList *			ioData)
 {
     OSStatus err = noErr;
-    _AUMSessionInRefConWrapper *me = (_AUMSessionInRefConWrapper *)inRefCon;
+    _BellSessionInRefConWrapper *me = (_BellSessionInRefConWrapper *)inRefCon;
     
     // Grab the mic data first for convenience
     if (me->micEnabled) {
@@ -57,9 +57,9 @@ OSStatus _AUMSessionRCBWrapper(void *inRefCon,
 #pragma mark -
 /////////////////////////////////////////////////////////////////////////
 
-@interface AUMSession ()
+@interface BellSession ()
 {
-    _AUMSessionInRefConWrapper _inRefConWrap;
+    _BellSessionInRefConWrapper _inRefConWrap;
 }
 
 /**  Make these RW so we can set them internal and leverage the atomicity */
@@ -72,7 +72,7 @@ OSStatus _AUMSessionRCBWrapper(void *inRefCon,
 #pragma mark -
 /////////////////////////////////////////////////////////////////////////
 
-@implementation AUMSession
+@implementation BellSession
 {
     AudioUnit _remoteIOUnit;
 }
@@ -101,7 +101,7 @@ OSStatus _AUMSessionRCBWrapper(void *inRefCon,
 {
     self = [super init];
     if (self) {
-        auto _ = AUM::ErrorChecker([AUMAudioSessionException class]);
+        auto _ = bell::ErrorChecker([BellAudioSessionException class]);
         NSError *err;
         
         AudioStreamBasicDescription asbd = streamFormat;
@@ -204,7 +204,7 @@ OSStatus _AUMSessionRCBWrapper(void *inRefCon,
         
         // Attach our wrapping render callback
         AURenderCallbackStruct rcbStruct;
-        rcbStruct.inputProc = _AUMSessionRCBWrapper;
+        rcbStruct.inputProc = _BellSessionRCBWrapper;
         rcbStruct.inputProcRefCon = &_inRefConWrap;
         
         _(AudioUnitSetProperty(_remoteIOUnit,
@@ -258,7 +258,7 @@ OSStatus _AUMSessionRCBWrapper(void *inRefCon,
 
 - (void)startAudio
 {
-    auto _ = AUM::ErrorChecker([AUMAudioSessionException class]);
+    auto _ = bell::ErrorChecker([BellAudioSessionException class]);
     _(AudioOutputUnitStart(_remoteIOUnit), @"Error starting the RemoteIO audio.");
 }
 
@@ -266,7 +266,7 @@ OSStatus _AUMSessionRCBWrapper(void *inRefCon,
 
 - (void)stopAudio
 {
-    auto _ = AUM::ErrorChecker([AUMAudioSessionException class]);
+    auto _ = bell::ErrorChecker([BellAudioSessionException class]);
     _(AudioOutputUnitStop(_remoteIOUnit), @"Error stoping the RemoteIO audio");
 }
 

@@ -1,23 +1,23 @@
 //
-//  FileRecorderModule.m
+//  FileRecorder.m
 //  MantraCraft
 //
 //  Created by Hari Karam Singh on 23/07/2014.
 //  Copyright (c) 2014 Air Craft. All rights reserved.
 //
 
-#import "FileRecorderModule.h"
+#import "FileRecorder.h"
 
 
-using namespace AUM;
+using namespace bell;
 
-FileRecorderModule::FileRecorderModule()
+FileRecorder::FileRecorder()
 {
     _audioBufferList = _createAudioBufferListStruct();
 }
 
 //---------------------------------------------------------------------
-FileRecorderModule::~FileRecorderModule()
+FileRecorder::~FileRecorder()
 {
     _destroyAudioBufferListStruct(_audioBufferList);
 }
@@ -25,7 +25,7 @@ FileRecorderModule::~FileRecorderModule()
 //---------------------------------------------------------------------
 
 
-void FileRecorderModule::setAudioFile(AUMAudioFile *audioFile)
+void FileRecorder::setAudioFile(BellAudioFile *audioFile)
  {
      _audioFile = audioFile;
  }

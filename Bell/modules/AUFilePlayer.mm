@@ -1,20 +1,21 @@
 //
 //  AUFilePlayerRenderer.cpp
-//  AUMLansingAudioBrains
+//  BellLansingAudioBrains
 //
 //  Created by Hari Karam Singh on 15/12/2013.
 //  Copyright (c) 2013 Air Craft Media Ltd. All rights reserved.
 //
 
-#import "AUFilePlayerModule.h"
-#import "AUMExceptions.h"
+#import "AUFilePlayer.h"
+#import "BellExceptions.h"
 
+using namespace bell::modules;
 
 /////////////////////////////////////////////////////////////////////////
 #pragma mark - Abstract fulfillment / Overrides
 /////////////////////////////////////////////////////////////////////////
 
-const AudioComponentDescription AUM::AUFilePlayerModule::_auComponentDescription()
+const AudioComponentDescription AUFilePlayer::_auComponentDescription()
 {
     AudioComponentDescription desc;
     desc.componentType          = kAudioUnitType_Generator;
@@ -26,24 +27,24 @@ const AudioComponentDescription AUM::AUFilePlayerModule::_auComponentDescription
 
 //---------------------------------------------------------------------
 
-void AUM::AUFilePlayerModule::_willInitializeAU()
+void AUFilePlayer::_willInitializeAU()
 {
-    // Enforce our canonical format as per AUAudioModuleBase's instructions
-    _setOutputBusStreamFormat(0, AUM_kCanonicalStreamFormat);    
+    // Enforce our canonical format as per AUModuleBase's instructions
+    _setOutputBusStreamFormat(0, kBellCanonicalStreamFormat);    
 }
 
 /////////////////////////////////////////////////////////////////////////
 #pragma mark - Publics
 /////////////////////////////////////////////////////////////////////////
 
-void AUM::AUFilePlayerModule::loadAudioFile(AUMAudioFile *audioFile)
+void AUFilePlayer::loadAudioFile(BellAudioFile *audioFile)
 {
-    auto _ = AUM::ErrorChecker([AUMAudioModuleException class]);
+    auto _ = bell::ErrorChecker([BellAudioModuleException class]);
     
     // Check the stream format matches out canonical
     const AudioStreamBasicDescription asbd = audioFile.clientStreamFormat;
-    if (0 != memcmp(&asbd, &AUM_kCanonicalStreamFormat, sizeof(AudioStreamBasicDescription))) {
-        @throw [AUMAudioModuleException exceptionWithFormat:@"AudioFile client stream format must match Canonical."];
+    if (0 != memcmp(&asbd, &kBellCanonicalStreamFormat, sizeof(AudioStreamBasicDescription))) {
+        @throw [BellAudioModuleException exceptionWithFormat:@"AudioFile client stream format must match Canonical."];
     }
     
     _audioFile = audioFile;
@@ -64,14 +65,14 @@ void AUM::AUFilePlayerModule::loadAudioFile(AUMAudioFile *audioFile)
 
 //---------------------------------------------------------------------
 
-void AUM::AUFilePlayerModule::play()
+void AUFilePlayer::play()
 {
     playFromFrame(0);
 }
 
 //---------------------------------------------------------------------
 
-void AUM::AUFilePlayerModule::playFromTime(NSTimeInterval startTime)
+void AUFilePlayer::playFromTime(NSTimeInterval startTime)
 {
     // Only works for now files types with a fixed sample rate (otherwise there is a LOT more work required)
     assert(_audioFile.fileStreamFormat.mSampleRate);
@@ -81,10 +82,10 @@ void AUM::AUFilePlayerModule::playFromTime(NSTimeInterval startTime)
 
 //---------------------------------------------------------------------
 
-void AUM::AUFilePlayerModule::playFromFrame(UInt32 startFrame)
+void AUFilePlayer::playFromFrame(UInt32 startFrame)
 {
     assert(startFrame < _audioFile.lengthInFrames);
-    auto _ = AUM::ErrorChecker([AUMAudioModuleException class]);
+    auto _ = bell::ErrorChecker([BellAudioModuleException class]);
 
     // Keep track for later playhead functions
     _startFrame = startFrame;
@@ -171,9 +172,9 @@ void AUM::AUFilePlayerModule::playFromFrame(UInt32 startFrame)
 
 //---------------------------------------------------------------------
 
-void AUM::AUFilePlayerModule::stop()
+void AUFilePlayer::stop()
 {
-    auto _ = AUM::ErrorChecker([AUMAudioModuleException class]);
+    auto _ = bell::ErrorChecker([BellAudioModuleException class]);
 
     _(AudioUnitReset(_audioUnit,
                      kAudioUnitScope_Global,
@@ -182,9 +183,9 @@ void AUM::AUFilePlayerModule::stop()
 
 //---------------------------------------------------------------------
 
-Float64 AUM::AUFilePlayerModule::playheadFrame()
+Float64 AUFilePlayer::playheadFrame()
 {
-    auto _ = AUM::ErrorChecker([AUMAudioModuleException class]);
+    auto _ = bell::ErrorChecker([BellAudioModuleException class]);
     
     // Query the playhed time
     AudioTimeStamp ts;
@@ -203,9 +204,9 @@ Float64 AUM::AUFilePlayerModule::playheadFrame()
 
 //---------------------------------------------------------------------
 
-NSTimeInterval AUM::AUFilePlayerModule::playheadTime()
+NSTimeInterval AUFilePlayer::playheadTime()
 {
-    return playheadFrame() / AUM_kCanonicalStreamFormat.mSampleRate;
+    return playheadFrame() / kBellCanonicalStreamFormat.mSampleRate;
 }
 
 //---------------------------------------------------------------------
